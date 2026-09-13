@@ -39,6 +39,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -77,6 +78,9 @@ dependencies {
 
     // Coil
     implementation(libs.coil.compose)
+
+    // Google Generative AI (Gemini)
+    implementation(libs.google.ai.generativeai)
 
     // Timber
     implementation(libs.timber)

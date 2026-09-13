@@ -21,8 +21,10 @@ loggingInterceptor = "4.12.0"
 coroutines = "1.8.1"
 mockk = "1.13.12"
 turbine = "1.1.0"
+generativeai = "0.9.0"
 
 [libraries]
+google-ai-generativeai = { group = "com.google.ai.client.generativeai", name = "generativeai", version.ref = "generativeai" }
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }
