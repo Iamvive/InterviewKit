@@ -1,53 +1,68 @@
-# InterviewKit (Base Branch: `main`)
+# InterviewKit (Branch: `ai-powers`)
 
-A production-ready starter template for Android technical interviews, live-coding rounds, and rapid prototyping with Clean Architecture and Jetpack Compose.
-
----
-
-## 🚀 Key Stack & Architecture
-
-- **UI & Theming**: Jetpack Compose, Material 3, Adaptive Layouts, Material Icons Extended
-- **Navigation**: Type-Safe Navigation 3 (`androidx.navigation3`) with List-Detail scene strategy
-- **Dependency Injection**: Dagger Hilt 2.51.1 (via KSP)
-- **Networking & Serialization**: Retrofit 2.11.0, OkHttp 4.12.0, Kotlinx Serialization
-- **Image Loading**: Coil Compose
-- **State & Concurrency**: Kotlin Coroutines, StateFlow (`collectAsStateWithLifecycle`)
-- **Unit Testing Suite**: MockK, Turbine, Kotlinx Coroutines Test, JUnit4
-- **Logging**: Timber
+An AI-augmented Android starter template featuring the official **Google Generative AI (Gemini) SDK**, Clean Architecture, Jetpack Compose, and real-time token streaming.
 
 ---
 
-## 📂 Project Structure
+## ⚡ AI Features Included
+
+1. **Google Generative AI Client**: Pre-configured with `gemini-1.5-flash` model.
+2. **Streaming Architecture**: Real-time token streaming (`Flow<String>`) in `AiRepository`.
+3. **AI Copilot Bottom Sheet**: Interactive Material 3 bottom sheet with quick action prompts ("Compose UDF Architecture", "Testing with Turbine", "Clean Architecture Tips") and live token-by-token rendering.
+4. **Dual Mode Execution**:
+   - **⚡ Live Gemini**: Enabled when `GEMINI_API_KEY` is provided.
+   - **✨ Demo Stream**: Works seamlessly out of the box without any API key (ideal for live interviews if network or API keys are restricted).
+
+---
+
+## 🔑 Setting Up Your Gemini API Key (Optional)
+
+You can pass your free Gemini API key via JVM system property or gradle property:
+
+```bash
+# In local.properties or command line
+./gradlew installDebug -DGEMINI_API_KEY="your-api-key-here"
+```
+
+Or inject it directly in [`AiModule.kt`](file:///Users/appworx/Desktop/Velo/app/src/main/java/com/interview/kit/di/AiModule.kt).
+
+---
+
+## 📂 Architecture
 
 ```
 app/src/main/java/com/interview/kit/
-├── App.kt                           # @HiltAndroidApp application class
-├── MainActivity.kt                  # Edge-to-edge Activity with NavigationState
-├── di/                              # Dependency Injection modules (Network, Repository)
-├── domain/                          # Pure Kotlin domain models
-├── data/                            # API service, DTOs, Repository implementations
-└── ui/
-    ├── home/                        # Home screen & ViewModel
-    ├── navigation/                  # Navigation 3 graph, backstack & navigator
-    └── theme/                       # Material 3 Color, Theme, Typography
+├── di/
+│   ├── AiModule.kt                  # Injects GenerativeModel & AiRepository
+│   ├── NetworkModule.kt             # Retrofit + OkHttp
+│   └── RepositoryModule.kt          # PostRepository binding
+├── domain/repository/
+│   └── AiRepository.kt              # Interface for AI streaming & summarization
+├── data/repository/
+│   └── AiRepositoryImpl.kt          # Implements Gemini streaming with demo fallback
+└── ui/ai/
+    ├── AiViewModel.kt               # Manages AiUiState (Idle, Streaming, Done, Error)
+    └── AiAssistantSheet.kt          # Composable bottom sheet with streaming UI
 ```
 
 ---
 
 ## 🧪 Testing
 
-Run JVM unit tests:
+Run all unit tests (Repository, ViewModel, AI streaming flows):
 ```bash
 ./gradlew testDebugUnitTest
 ```
 
-The testing suite includes:
-- `PostRepositoryTest`: Verifies DTO-to-Domain mapping and error propagation with MockK.
-- `HomeViewModelTest`: Verifies initial loading, success, retry, and error flows with Turbine and `StandardTestDispatcher`.
-
 ---
 
-## 🌿 Branches in this Repository
+## 🌿 Switching Branches
 
-- **`main`**: Standard / Base setup (Zero AI dependencies — ideal for FAANG and strict coding rounds).
-- **`ai-powers`**: AI-augmented setup with Google Generative AI (Gemini SDK), `AiRepository`, and streaming Compose UI.
+- To use the **Strict / Non-AI base template**:
+  ```bash
+  git checkout main
+  ```
+- To return to the **AI-enabled template**:
+  ```bash
+  git checkout ai-powers
+  ```

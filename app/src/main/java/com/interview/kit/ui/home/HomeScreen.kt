@@ -29,35 +29,69 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.interview.kit.ui.theme.InterviewKitTheme
 import com.interview.kit.domain.model.Post
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.interview.kit.ui.ai.AiAssistantSheet
+import com.interview.kit.ui.ai.AiViewModel
+
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
     onPostClick: (Post) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    aiViewModel: AiViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var showAiSheet by remember { mutableStateOf(false) }
 
-    Box(
+    Scaffold(
         modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        when (val state = uiState) {
-            is HomeUiState.Loading -> {
-                CircularProgressIndicator()
-            }
-            is HomeUiState.Success -> {
-                PostList(
-                    posts = state.posts,
-                    onPostClick = onPostClick
-                )
-            }
-            is HomeUiState.Error -> {
-                ErrorView(
-                    message = state.message,
-                    onRetry = { viewModel.fetchPosts() }
-                )
+        floatingActionButton = {
+            ExtendedFloatingActionButton(
+                onClick = { showAiSheet = true },
+                icon = { Icon(Icons.Default.AutoAwesome, contentDescription = null) },
+                text = { Text("AI Copilot") }
+            )
+        }
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+            contentAlignment = Alignment.Center
+        ) {
+            when (val state = uiState) {
+                is HomeUiState.Loading -> {
+                    CircularProgressIndicator()
+                }
+                is HomeUiState.Success -> {
+                    PostList(
+                        posts = state.posts,
+                        onPostClick = onPostClick
+                    )
+                }
+                is HomeUiState.Error -> {
+                    ErrorView(
+                        message = state.message,
+                        onRetry = { viewModel.fetchPosts() }
+                    )
+                }
             }
         }
+    }
+
+    if (showAiSheet) {
+        AiAssistantSheet(
+            viewModel = aiViewModel,
+            onDismiss = { showAiSheet = false }
+        )
     }
 }
 
