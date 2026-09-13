@@ -1,17 +1,53 @@
-# InterviewKit
+# InterviewKit (Base Branch: `main`)
 
-Starter project for Android technical interviews.
+A production-ready starter template for Android technical interviews, live-coding rounds, and rapid prototyping with Clean Architecture and Jetpack Compose.
 
-## Infrastructure
-- **Hilt**: Dependency injection
-- **Retrofit + OkHttp**: Networking
-- **Kotlinx Serialization**: JSON parsing
-- **Coil**: Image loading
-- **Compose Navigation**: Navigation (type-safe)
-- **Timber**: Logging
-- **Jetpack Compose**: UI
+---
 
-## Setup
-1. Clone the repository.
-2. Open in Android Studio.
-3. Sync Gradle and run the app.
+## 🚀 Key Stack & Architecture
+
+- **UI & Theming**: Jetpack Compose, Material 3, Adaptive Layouts, Material Icons Extended
+- **Navigation**: Type-Safe Navigation 3 (`androidx.navigation3`) with List-Detail scene strategy
+- **Dependency Injection**: Dagger Hilt 2.51.1 (via KSP)
+- **Networking & Serialization**: Retrofit 2.11.0, OkHttp 4.12.0, Kotlinx Serialization
+- **Image Loading**: Coil Compose
+- **State & Concurrency**: Kotlin Coroutines, StateFlow (`collectAsStateWithLifecycle`)
+- **Unit Testing Suite**: MockK, Turbine, Kotlinx Coroutines Test, JUnit4
+- **Logging**: Timber
+
+---
+
+## 📂 Project Structure
+
+```
+app/src/main/java/com/interview/kit/
+├── App.kt                           # @HiltAndroidApp application class
+├── MainActivity.kt                  # Edge-to-edge Activity with NavigationState
+├── di/                              # Dependency Injection modules (Network, Repository)
+├── domain/                          # Pure Kotlin domain models
+├── data/                            # API service, DTOs, Repository implementations
+└── ui/
+    ├── home/                        # Home screen & ViewModel
+    ├── navigation/                  # Navigation 3 graph, backstack & navigator
+    └── theme/                       # Material 3 Color, Theme, Typography
+```
+
+---
+
+## 🧪 Testing
+
+Run JVM unit tests:
+```bash
+./gradlew testDebugUnitTest
+```
+
+The testing suite includes:
+- `PostRepositoryTest`: Verifies DTO-to-Domain mapping and error propagation with MockK.
+- `HomeViewModelTest`: Verifies initial loading, success, retry, and error flows with Turbine and `StandardTestDispatcher`.
+
+---
+
+## 🌿 Branches in this Repository
+
+- **`main`**: Standard / Base setup (Zero AI dependencies — ideal for FAANG and strict coding rounds).
+- **`ai-powers`**: AI-augmented setup with Google Generative AI (Gemini SDK), `AiRepository`, and streaming Compose UI.
