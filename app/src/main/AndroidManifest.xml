@@ -32,7 +32,7 @@
         <!-- Activity B (singleTop launchMode) -->
         <activity
             android:name=".launchmodes.ActivityB"
-            android:exported="false"
+            android:exported="true"
             android:label="Activity B (singleTop)"
             android:launchMode="singleTop"
             android:theme="@style/Theme.InterviewKit"
@@ -41,7 +41,7 @@
         <!-- Activity C (singleTask launchMode) -->
         <activity
             android:name=".launchmodes.ActivityC"
-            android:exported="false"
+            android:exported="true"
             android:label="Activity C (singleTask)"
             android:launchMode="singleTask"
             android:theme="@style/Theme.InterviewKit"
@@ -50,7 +50,7 @@
         <!-- Activity D (singleInstance launchMode) -->
         <activity
             android:name=".launchmodes.ActivityD"
-            android:exported="false"
+            android:exported="true"
             android:label="Activity D (singleInstance)"
             android:launchMode="singleInstance"
             android:theme="@style/Theme.InterviewKit"

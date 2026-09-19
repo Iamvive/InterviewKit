@@ -67,7 +67,8 @@ fun LaunchModePlaygroundUi(
     themeColor: Color,
     newIntentCount: Int,
     lastIntentMessage: String?,
-    onFinishActivity: () -> Unit
+    onFinishActivity: () -> Unit,
+    setIntentDemo: SetIntentDemoState? = null
 ) {
     val context = LocalContext.current
     val currentActivity = context as? Activity
@@ -190,12 +191,134 @@ fun LaunchModePlaygroundUi(
                                 modifier = Modifier.fillMaxWidth()
                             ) {
                                 Text(
-                                    text = "🔄 onNewIntent called $newIntentCount time(s)! Last: ${lastIntentMessage ?: "none"}",
+                                    text = "🔄 onNewIntent called $newIntentCount time(s)! Last payload: ${lastIntentMessage ?: "none"}",
                                     color = Color(0xFF2E7D32),
                                     fontWeight = FontWeight.Medium,
                                     fontSize = 12.sp,
                                     modifier = Modifier.padding(8.dp)
                                 )
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Interactive onNewIntent & setIntent() Trap Lab (ActivityB)
+            if (setIntentDemo != null) {
+                item {
+                    Card(
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color(0xFFE0F2F1)
+                        ),
+                        border = androidx.compose.foundation.BorderStroke(1.5.dp, Color(0xFF00897B))
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    text = "🧪 Interview Lab: The setIntent() Trap",
+                                    fontWeight = FontWeight.Bold,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = Color(0xFF004D40)
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "See what happens when setIntent(intent) is omitted inside onNewIntent():",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Color(0xFF004D40)
+                            )
+
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            // Switch / Checkbox
+                            Surface(
+                                shape = RoundedCornerShape(8.dp),
+                                color = Color.White,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(8.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Checkbox(
+                                        checked = setIntentDemo.callSetIntentEnabled,
+                                        onCheckedChange = setIntentDemo.onToggleSetIntent
+                                    )
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Column {
+                                        Text(
+                                            text = if (setIntentDemo.callSetIntentEnabled) "✅ setIntent(newIntent) is CALLED" else "❌ setIntent(newIntent) is SKIPPED (Buggy)",
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 13.sp,
+                                            color = if (setIntentDemo.callSetIntentEnabled) Color(0xFF2E7D32) else Color(0xFFC62828)
+                                        )
+                                        Text(
+                                            text = if (setIntentDemo.callSetIntentEnabled) "getIntent() will update to the latest payload" else "getIntent() will return old stale payload!",
+                                            fontSize = 11.sp,
+                                            color = Color.Gray
+                                        )
+                                    }
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            // Comparison Results Box
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(Color.White, RoundedCornerShape(8.dp))
+                                    .padding(10.dp),
+                                verticalArrangement = Arrangement.spacedBy(6.dp)
+                            ) {
+                                Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+                                    Text("📥 onNewIntent received:", fontSize = 12.sp, color = Color.Gray)
+                                    Text(
+                                        text = setIntentDemo.receivedOnNewIntent ?: "None yet",
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 12.sp,
+                                        color = Color(0xFF00796B)
+                                    )
+                                }
+                                Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+                                    Text("🔍 getIntent() returns:", fontSize = 12.sp, color = Color.Gray)
+                                    Text(
+                                        text = setIntentDemo.currentGetIntentResult ?: "None",
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 12.sp,
+                                        color = if (setIntentDemo.receivedOnNewIntent != null && setIntentDemo.receivedOnNewIntent != setIntentDemo.currentGetIntentResult) Color(0xFFD32F2F) else Color(0xFF2E7D32)
+                                    )
+                                }
+
+                                if (setIntentDemo.receivedOnNewIntent != null && setIntentDemo.receivedOnNewIntent != setIntentDemo.currentGetIntentResult) {
+                                    Surface(
+                                        color = Color(0xFFFFEBEE),
+                                        shape = RoundedCornerShape(4.dp),
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
+                                        Text(
+                                            text = "🚨 TRAP TRIGGERED: getIntent() returned STALE data because setIntent() was not called!",
+                                            color = Color(0xFFC62828),
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 11.sp,
+                                            modifier = Modifier.padding(6.dp)
+                                        )
+                                    }
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(10.dp))
+
+                            Button(
+                                onClick = {
+                                    val newMsg = "Payload #${(100..999).random()} (at ${System.currentTimeMillis() % 10000})"
+                                    setIntentDemo.onSendSelfIntent(newMsg)
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00897B))
+                            ) {
+                                Text("⚡ Send New Payload to Self (singleTop)")
                             }
                         }
                     }
