@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Android Launch Modes & Tasks Masterclass</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0b0f19;
+            --bg-secondary: #111827;
+            --bg-card: rgba(17, 24, 39, 0.7);
+            --bg-glass: rgba(31, 41, 55, 0.5);
+            --border: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(255, 255, 255, 0.16);
+            --text-primary: #f9fafb;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            --accent-blue: #3b82f6;
+            --accent-indigo: #6366f1;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-purple: #a855f7;
+            --accent-rose: #f43f5e;
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+            --glow-indigo: 0 0 40px -10px rgba(99, 102, 241, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding-bottom: 80px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Ambient glowing background */
+        .ambient-glow {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 1000px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, rgba(16, 185, 129, 0.05) 50%, rgba(11, 15, 25, 0) 70%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+
+        /* Header */
+        header {
+            margin-bottom: 48px;
+            text-align: center;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 9999px;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: rgba(99, 102, 241, 0.12);
+            color: #818cf8;
+            border: 1px solid rgba(99, 102, 241, 0.25);
+            margin-bottom: 16px;
+        }
+
+        h1 {
+            font-size: clamp(32px, 5vw, 48px);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 50%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 14px;
+        }
+
+        .subtitle {
+            font-size: 17px;
+            color: var(--text-secondary);
+            max-width: 680px;
+            margin: 0 auto;
+        }
+
+        /* Nav Pills / Quick Jump */
+        .nav-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin: 32px 0 48px;
+        }
+
+        .nav-pill {
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            border: 1px solid var(--border);
+            transition: all 0.2s ease;
+        }
+
+        .nav-pill:hover {
+            color: var(--text-primary);
+            border-color: var(--accent-indigo);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        /* Card System */
+        .section-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            margin-bottom: 32px;
+            box-shadow: var(--shadow-sm);
+            transition: border-color 0.2s ease;
+        }
+
+        .section-card:hover {
+            border-color: var(--border-hover);
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+
+        .section-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        /* Launch Modes Grid */
+        .modes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .mode-item {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.2s ease;
+        }
+
+        .mode-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .mode-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .mode-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+
+        .tag-blue { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+        .tag-emerald { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .tag-amber { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+        .tag-purple { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }
+        .tag-rose { background: rgba(244, 63, 94, 0.15); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.3); }
+
+        .mode-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .mode-bullet {
+            font-size: 13px;
+            color: #d1d5db;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .mode-bullet span {
+            color: var(--accent-indigo);
+            font-weight: bold;
+        }
+
+        /* Code Block */
+        pre, code {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .code-container {
+            background: #090d16;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 18px 20px;
+            margin: 16px 0;
+            overflow-x: auto;
+            font-size: 13px;
+            line-height: 1.7;
+            color: #e2e8f0;
+        }
+
+        .code-keyword { color: #f43f5e; font-weight: 600; }
+        .code-type { color: #38bdf8; }
+        .code-string { color: #34d399; }
+        .code-comment { color: #64748b; font-style: italic; }
+        .code-func { color: #a78bfa; }
+
+        /* Comparison Table */
+        .table-responsive {
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-weight: 600;
+            padding: 14px 16px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+            color: var(--text-primary);
+        }
+
+        /* Interactive Simulator Box */
+        .sim-box {
+            background: #090d16;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--glow-indigo);
+        }
+
+        .stack-view {
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 8px;
+            min-height: 140px;
+            background: var(--bg-secondary);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px dashed var(--border);
+            justify-content: flex-start;
+        }
+
+        .stack-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            font-weight: 600;
+            animation: slideIn 0.2s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .sim-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .sim-btn {
+            padding: 10px 18px;
+            border-radius: var(--radius-sm);
+            border: none;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            color: #fff;
+        }
+
+        .sim-btn:active { transform: scale(0.97); }
+        .btn-blue { background: #2563eb; }
+        .btn-emerald { background: #059669; }
+        .btn-amber { background: #d97706; }
+        .btn-purple { background: #7c3aed; }
+        .btn-clear { background: #374151; color: #d1d5db; }
+
+        /* Accordion / Q&A */
+        .qa-item {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+
+        .qa-question {
+            padding: 18px 20px;
+            font-weight: 600;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .qa-question:hover {
+            color: var(--accent-indigo);
+        }
+
+        .qa-answer {
+            padding: 0 20px 18px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.7;
+            display: none;
+            border-top: 1px solid var(--border);
+            padding-top: 14px;
+        }
+
+        .qa-item.active .qa-answer {
+            display: block;
+        }
+
+        .qa-arrow {
+            transition: transform 0.2s ease;
+        }
+
+        .qa-item.active .qa-arrow {
+            transform: rotate(180deg);
+        }
+
+        /* Alert / Callout */
+        .callout {
+            border-left: 4px solid var(--accent-amber);
+            background: rgba(245, 158, 11, 0.08);
+            padding: 16px 20px;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            margin: 16px 0;
+            font-size: 14px;
+            color: #fde68a;
+        }
+
+        .callout strong { color: #fff; }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-glow"></div>
+
+    <div class="container">
+
+        <header>
+            <div class="badge">🚀 Android Systems Masterclass</div>
+            <h1>Android Tasks & Launch Modes</h1>
+            <p class="subtitle">Complete technical reference, under-the-hood OS mechanics, real-world library patterns, and top interview questions.</p>
+
+            <nav class="nav-pills">
+                <a href="#simulator" class="nav-pill">Interactive Simulator</a>
+                <a href="#modes" class="nav-pill">The 5 Launch Modes</a>
+                <a href="#onnewintent" class="nav-pill">The setIntent() Trap</a>
+                <a href="#taskaffinity" class="nav-pill">Task Affinity & Chucker</a>
+                <a href="#launcher-filter" class="nav-pill">Launcher Filter Mechanics</a>
+                <a href="#interview-qa" class="nav-pill">Interview Q&A</a>
+            </nav>
+        </header>
+
+        <!-- SECTION 1: Interactive Simulator -->
+        <section id="simulator" class="section-card">
+            <div class="section-title">
+                <div class="section-icon" style="background: rgba(99, 102, 241, 0.2); color: #818cf8;">🎮</div>
+                <h2>Interactive Back Stack Simulator</h2>
+            </div>
+            <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 16px;">
+                Test how each launch mode modifies the back stack in real-time. Notice how <code>singleTask</code> destroys activities above it, and <code>singleTop</code> reuses the top instance!
+            </p>
+
+            <div class="sim-box">
+                <div style="font-size: 12px; font-weight: 700; color: #94a3b8; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">
+                    Current Back Stack (Top on Top)
+                </div>
+                <div id="sim-stack" class="stack-view"></div>
+
+                <div class="sim-controls">
+                    <button class="sim-btn btn-blue" onclick="launchSim('ActivityA', 'standard', 'tag-blue')">+ Launch Activity A (standard)</button>
+                    <button class="sim-btn btn-emerald" onclick="launchSim('ActivityB', 'singleTop', 'tag-emerald')">+ Launch Activity B (singleTop)</button>
+                    <button class="sim-btn btn-amber" onclick="launchSim('ActivityC', 'singleTask', 'tag-amber')">+ Launch Activity C (singleTask)</button>
+                    <button class="sim-btn btn-purple" onclick="launchSim('ActivityD', 'singleInstance', 'tag-purple')">+ Launch Activity D (singleInstance)</button>
+                    <button class="sim-btn btn-clear" onclick="popSim()">⬅️ Press Back</button>
+                    <button class="sim-btn btn-clear" style="margin-left: auto;" onclick="resetSim()">Reset</button>
+                </div>
+
+                <div id="sim-log" style="margin-top: 14px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #a78bfa;">
+                    Action: Initialized with Activity A
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: The 5 Launch Modes -->
+        <section id="modes" class="section-card">
+            <div class="section-title">
+                <div class="section-icon" style="background: rgba(16, 185, 129, 0.2); color: #34d399;">📑</div>
+                <h2>The 5 Manifest Launch Modes</h2>
+            </div>
+
+            <div class="modes-grid">
+                <!-- Standard -->
+                <div class="mode-item">
+                    <div>
+                        <div class="mode-header">
+                            <h3 style="font-size: 17px; font-weight: 700;">standard</h3>
+                            <span class="mode-tag tag-blue">Default</span>
+                        </div>
+                        <p class="mode-desc">Unconditionally creates a brand new instance and pushes it onto the task stack every time.</p>
+                        <div class="mode-bullet"><span>•</span> Multiple instances allowed in same and different tasks.</div>
+                        <div class="mode-bullet"><span>•</span> <code>onNewIntent()</code> is <strong>NEVER</strong> called.</div>
+                        <div class="mode-bullet"><span>•</span> Ideal for product details, forms, standard pages.</div>
+                    </div>
+                </div>
+
+                <!-- SingleTop -->
+                <div class="mode-item">
+                    <div>
+                        <div class="mode-header">
+                            <h3 style="font-size: 17px; font-weight: 700;">singleTop</h3>
+                            <span class="mode-tag tag-emerald">Top-Only Reuse</span>
+                        </div>
+                        <p class="mode-desc">Reuses instance ONLY if it is already sitting at the top of the stack. Otherwise creates a new one.</p>
+                        <div class="mode-bullet"><span>•</span> Reused at top: <code>onPause()</code> → <code>onNewIntent()</code> → <code>onResume()</code>.</div>
+                        <div class="mode-bullet"><span>•</span> Avoids duplicate screens when spam-clicking.</div>
+                        <div class="mode-bullet"><span>•</span> Ideal for search screens, chat messaging targets.</div>
+                    </div>
+                </div>
+
+                <!-- SingleTask -->
+                <div class="mode-item">
+                    <div>
+                        <div class="mode-header">
+                            <h3 style="font-size: 17px; font-weight: 700;">singleTask</h3>
+                            <span class="mode-tag tag-amber">Clear-Top Anchor</span>
+                        </div>
+                        <p class="mode-desc">At most ONE instance per task. If it exists, brings it to front and <strong>destroys all activities above it</strong>.</p>
+                        <div class="mode-bullet"><span>•</span> Invokes <code>onNewIntent()</code> → <code>onRestart()</code> → <code>onResume()</code>.</div>
+                        <div class="mode-bullet"><span>•</span> Creates new task if launched with different <code>taskAffinity</code>.</div>
+                        <div class="mode-bullet"><span>•</span> Ideal for Home/Dashboard, deep-link landing pages.</div>
+                    </div>
+                </div>
+
+                <!-- SingleInstance -->
+                <div class="mode-item">
+                    <div>
+                        <div class="mode-header">
+                            <h3 style="font-size: 17px; font-weight: 700;">singleInstance</h3>
+                            <span class="mode-tag tag-purple">Complete Isolation</span>
+                        </div>
+                        <p class="mode-desc">Runs in its own exclusive task. <strong>No other Activity can ever join its task</strong>.</p>
+                        <div class="mode-bullet"><span>•</span> Launching any other Activity forces it into a separate task.</div>
+                        <div class="mode-bullet"><span>•</span> Only 1 instance exists system-wide.</div>
+                        <div class="mode-bullet"><span>•</span> Ideal for Incoming Call screen, Alarm ringing, Launcher.</div>
+                    </div>
+                </div>
+
+                <!-- SingleInstancePerTask -->
+                <div class="mode-item" style="grid-column: 1 / -1;">
+                    <div>
+                        <div class="mode-header">
+                            <h3 style="font-size: 17px; font-weight: 700;">singleInstancePerTask</h3>
+                            <span class="mode-tag tag-rose">API 31+ (Android 12)</span>
+                        </div>
+                        <p class="mode-desc">A modern hybrid: Can have multiple instances across the system, but each instance must be the solitary root of its own Task.</p>
+                        <div class="mode-bullet"><span>•</span> When combined with <code>FLAG_ACTIVITY_MULTIPLE_TASK</code>, always opens a fresh independent window.</div>
+                        <div class="mode-bullet"><span>•</span> Built specifically for multi-window, tablets, and foldable devices (e.g. multi-document editing).</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: The setIntent() Trap -->
+        <section id="onnewintent" class="section-card">
+            <div class="section-title">
+                <div class="section-icon" style="background: rgba(244, 63, 94, 0.2); color: #fb7185;">⚠️</div>
+                <h2>The Critical <code>onNewIntent()</code> Code Trap</h2>
+            </div>
+
+            <p style="color: var(--text-secondary); font-size: 14px;">
+                When an Activity is reused (in <code>singleTop</code>, <code>singleTask</code>, or <code>singleInstance</code>), calling <code>getIntent()</code> will <strong>STILL RETURN THE OLD ORIGINAL INTENT</strong> unless you manually update it!
+            </p>
+
+            <div class="code-container">
+<span class="code-keyword">class</span> <span class="code-type">ProductActivity</span> : <span class="code-type">ComponentActivity</span>() {
+
+    <span class="code-keyword">override fun</span> <span class="code-func">onCreate</span>(savedInstanceState: <span class="code-type">Bundle</span>?) {
+        <span class="code-keyword">super</span>.onCreate(savedInstanceState)
+        <span class="code-keyword">val</span> id = intent.getStringExtra(<span class="code-string">"ID"</span>) <span class="code-comment">// Reads initial intent</span>
+    }
+
+    <span class="code-keyword">override fun</span> <span class="code-func">onNewIntent</span>(newIntent: <span class="code-type">Intent</span>) {
+        <span class="code-keyword">super</span>.onNewIntent(newIntent)
+
+        <span class="code-comment">// 🚨 CRITICAL SENIOR INTERVIEW REQUIREMENT:</span>
+        <span class="code-comment">// You MUST call setIntent(newIntent), otherwise any helper function or</span>
+        <span class="code-comment">// ViewModel calling getIntent() will receive stale, outdated extras!</span>
+        <span class="code-func">setIntent</span>(newIntent)
+
+        <span class="code-keyword">val</span> updatedId = newIntent.getStringExtra(<span class="code-string">"ID"</span>)
+        updateUi(updatedId)
+    }
+}
+            </div>
+
+            <div class="callout">
+                <strong>Interview Gotcha:</strong> If you pass extras into a reused Activity and observe that your background repository or analytics still logs the old data, 99% of the time it is because the developer forgot <code>setIntent(newIntent)</code>!
+            </div>
+        </section>
+
+        <!-- SECTION 4: Task Affinity & Chucker -->
+        <section id="taskaffinity" class="section-card">
+            <div class="section-title">
+                <div class="section-icon" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24;">🏗️</div>
+                <h2>Task Affinity & Production Architecture: The Chucker Case Study</h2>
+            </div>
+
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Concept</th>
+                            <th>Mental Model</th>
+                            <th>What It Controls</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong style="color: #60a5fa;">taskAffinity</strong></td>
+                            <td><em>"WHERE it lives"</em></td>
+                            <td>Which Task / Window group the Activity belongs to (Default: <code>packageName</code>).</td>
+                        </tr>
+                        <tr>
+                            <td><strong style="color: #fbbf24;">launchMode</strong></td>
+                            <td><em>"HOW it behaves"</em></td>
+                            <td>Instance creation rules (new vs reused) inside that Task.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h4 style="font-size: 16px; margin: 20px 0 10px; color: #e2e8f0;">Why Chucker Uses <code>taskAffinity + singleTask</code>:</h4>
+            <div class="code-container">
+<span class="code-comment">&lt;!-- Inside Chucker Library Manifest --&gt;</span>
+&lt;<span class="code-keyword">activity</span>
+    <span class="code-type">android:name</span>=<span class="code-string">"com.chuckerteam.chucker.internal.ui.MainActivity"</span>
+    <span class="code-type">android:launchMode</span>=<span class="code-string">"singleTask"</span>
+    <span class="code-type">android:taskAffinity</span>=<span class="code-string">"com.chuckerteam.chucker.task"</span> /&gt;
+            </div>
+
+            <div class="mode-bullet"><span>1.</span> <strong>Custom taskAffinity:</strong> Prevents Chucker from hijacking the host app's back stack (e.g. your Checkout flow). Chucker gets its own independent Recent Apps card.</div>
+            <div class="mode-bullet"><span>2.</span> <strong>singleTask:</strong> Clicking multiple HTTP traffic notifications reuses the same Chucker window via <code>onNewIntent()</code> instead of stacking duplicate screens.</div>
+        </section>
+
+        <!-- SECTION 5: Launcher Intent Filter -->
+        <section id="launcher-filter" class="section-card">
+            <div class="section-title">
+                <div class="section-icon" style="background: rgba(59, 130, 246, 0.2); color: #60a5fa;">📱</div>
+                <h2>Launcher Intent Filters: What Happens & Why</h2>
+            </div>
+
+            <div class="code-container">
+&lt;<span class="code-keyword">intent-filter</span>&gt;
+    &lt;<span class="code-keyword">action</span> <span class="code-type">android:name</span>=<span class="code-string">"android.intent.action.MAIN"</span> /&gt;
+    &lt;<span class="code-keyword">category</span> <span class="code-type">android:name</span>=<span class="code-string">"android.intent.category.LAUNCHER"</span> /&gt;
+&lt;/<span class="code-keyword">intent-filter</span>&gt;
+            </div>
+
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Scenario</th>
+                            <th>What Happens</th>
+                            <th>Why Under the Hood</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>0 Activities have filter</strong></td>
+                            <td>App installs, but <strong>NO icon</strong> in App Drawer.</td>
+                            <td>Launcher queries <code>PackageManager.queryIntentActivities()</code> for <code>ACTION_MAIN + LAUNCHER</code>. Found 0 records.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>3 Activities have filter</strong></td>
+                            <td><strong>3 separate app icons</strong> appear in App Drawer!</td>
+                            <td>Launcher creates a tile for <em>every Activity</em> declaring the filter, with its respective <code>android:label</code>.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- SECTION 6: Top Interview Q&A -->
+        <section id="interview-qa" class="section-card">
+            <div class="section-title">
+                <div class="section-icon" style="background: rgba(168, 85, 247, 0.2); color: #c084fc;">🎯</div>
+                <h2>Senior Android Interview Q&A Cheatsheet</h2>
+            </div>
+
+            <div class="qa-item active">
+                <div class="qa-question" onclick="toggleQa(this)">
+                    <span>Q1: What is the difference between singleTask and FLAG_ACTIVITY_CLEAR_TOP?</span>
+                    <span class="qa-arrow">▼</span>
+                </div>
+                <div class="qa-answer">
+                    <strong>Answer:</strong> <code>singleTask</code> is configured in the manifest and will always reuse the existing instance and deliver via <code>onNewIntent()</code>.<br>
+                    In contrast, <code>FLAG_ACTIVITY_CLEAR_TOP</code> is an intent flag. If the target activity is configured with <code>standard</code> launch mode, <code>CLEAR_TOP</code> will <strong>destroy the target activity too</strong> and call <code>onCreate()</code> on a new instance, UNLESS combined with <code>FLAG_ACTIVITY_SINGLE_TOP</code>!
+                </div>
+            </div>
+
+            <div class="qa-item">
+                <div class="qa-question" onclick="toggleQa(this)">
+                    <span>Q2: What is the exact lifecycle order when launching Activity B from Activity A?</span>
+                    <span class="qa-arrow">▼</span>
+                </div>
+                <div class="qa-answer">
+                    <strong>Answer:</strong><br>
+                    1. <code>A.onPause()</code><br>
+                    2. <code>B.onCreate()</code> → <code>B.onStart()</code> → <code>B.onResume()</code> (B is now interactive)<br>
+                    3. <code>A.onStop()</code><br>
+                    <em>Key point: A.onPause() MUST complete before B is created, which is why blocking work in onPause() causes sluggish transitions.</em>
+                </div>
+            </div>
+
+            <div class="qa-item">
+                <div class="qa-question" onclick="toggleQa(this)">
+                    <span>Q3: How does the OS decide whether to call onNewIntent() for singleTop?</span>
+                    <span class="qa-arrow">▼</span>
+                </div>
+                <div class="qa-answer">
+                    <strong>Answer:</strong> Inside <code>system_server</code>, <code>ActivityTaskManagerService</code> checks the focused task's child list: <code>mChildren.last()</code>. If <code>top.component.equals(targetIntent.component)</code> and <code>launchMode == singleTop</code>, it delivers the intent to <code>deliverNewIntentLocked()</code> without allocating a new <code>ActivityRecord</code>.
+                </div>
+            </div>
+
+            <div class="qa-item">
+                <div class="qa-question" onclick="toggleQa(this)">
+                    <span>Q4: How do you implement a clean Logout flow that clears all screens?</span>
+                    <span class="qa-arrow">▼</span>
+                </div>
+                <div class="qa-answer">
+                    <strong>Answer:</strong>
+                    <div class="code-container">
+<span class="code-keyword">val</span> intent = <span class="code-type">Intent</span>(context, <span class="code-type">LoginActivity</span>::<span class="code-keyword">class</span>.java).apply {
+    flags = <span class="code-type">Intent</span>.FLAG_ACTIVITY_NEW_TASK or <span class="code-type">Intent</span>.FLAG_ACTIVITY_CLEAR_TASK
+}
+context.startActivity(intent)
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        // Interactive Simulator Logic
+        let simStack = ['ActivityA'];
+        const stackEl = document.getElementById('sim-stack');
+        const logEl = document.getElementById('sim-log');
+
+        function renderSim() {
+            stackEl.innerHTML = '';
+            simStack.forEach((item, index) => {
+                const el = document.createElement('div');
+                el.className = `stack-item ${getTagClass(item)}`;
+                const isTop = index === simStack.length - 1;
+                el.innerHTML = `
+                    <span>[${index + 1}] ${item}</span>
+                    <span style="font-size: 11px; padding: 2px 6px; border-radius: 4px; background: rgba(0,0,0,0.3);">
+                        ${isTop ? '⭐ ACTIVE TOP' : 'Paused'}
+                    </span>
+                `;
+                stackEl.appendChild(el);
+            });
+        }
+
+        function getTagClass(name) {
+            if (name.includes('ActivityA')) return 'tag-blue';
+            if (name.includes('ActivityB')) return 'tag-emerald';
+            if (name.includes('ActivityC')) return 'tag-amber';
+            if (name.includes('ActivityD')) return 'tag-purple';
+            return 'tag-blue';
+        }
+
+        function launchSim(name, mode, tagClass) {
+            const top = simStack[simStack.length - 1];
+
+            if (mode === 'standard') {
+                simStack.push(name);
+                logEl.innerHTML = `Action: <span style="color: #60a5fa;">standard</span> -> Created new instance of ${name}`;
+            } else if (mode === 'singleTop') {
+                if (top === name) {
+                    logEl.innerHTML = `Action: <span style="color: #34d399;">singleTop</span> -> ${name} already at top! Reused via onNewIntent()`;
+                } else {
+                    simStack.push(name);
+                    logEl.innerHTML = `Action: <span style="color: #34d399;">singleTop</span> -> ${name} was not at top, created new instance.`;
+                }
+            } else if (mode === 'singleTask') {
+                const foundIndex = simStack.indexOf(name);
+                if (foundIndex !== -1) {
+                    const destroyedCount = simStack.length - 1 - foundIndex;
+                    simStack = simStack.slice(0, foundIndex + 1);
+                    logEl.innerHTML = `Action: <span style="color: #fbbf24;">singleTask</span> -> Found ${name}! Destroyed ${destroyedCount} activity(ies) above it and called onNewIntent().`;
+                } else {
+                    simStack.push(name);
+                    logEl.innerHTML = `Action: <span style="color: #fbbf24;">singleTask</span> -> Created as anchor in task.`;
+                }
+            } else if (mode === 'singleInstance') {
+                logEl.innerHTML = `Action: <span style="color: #c084fc;">singleInstance</span> -> Opened in its own separate Task #2!`;
+            }
+
+            renderSim();
+        }
+
+        function popSim() {
+            if (simStack.length > 1) {
+                const popped = simStack.pop();
+                logEl.innerHTML = `Action: Back button pressed -> Destroyed ${popped}`;
+                renderSim();
+            } else {
+                logEl.innerHTML = `Action: Cannot pop root activity.`;
+            }
+        }
+
+        function resetSim() {
+            simStack = ['ActivityA'];
+            logEl.innerHTML = `Action: Reset stack to [ActivityA]`;
+            renderSim();
+        }
+
+        function toggleQa(el) {
+            const parent = el.parentElement;
+            parent.classList.toggle('active');
+        }
+
+        // Init
+        renderSim();
+    </script>
+</body>
+</html>
