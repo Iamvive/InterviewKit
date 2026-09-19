@@ -1,6 +1,7 @@
 package com.interview.kit
 
 import android.app.Application
+import com.interview.kit.launchmodes.TaskStackTracker
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 
@@ -9,5 +10,6 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         Timber.plant(Timber.DebugTree())
+        TaskStackTracker.init(this)
     }
 }

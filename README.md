@@ -7,7 +7,7 @@ A production-ready starter template for Android technical interviews, live-codin
 ## 🚀 Key Stack & Architecture
 
 - **UI & Theming**: Jetpack Compose, Material 3, Adaptive Layouts, Material Icons Extended
-- **Navigation**: Type-Safe Navigation 3 (`androidx.navigation3`) with List-Detail scene strategy
+- **Navigation**: Type-Safe Navigation 2.8.2 (`androidx.navigation:navigation-compose`) with `material3-adaptive`
 - **Dependency Injection**: Dagger Hilt 2.51.1 (via KSP)
 - **Networking & Serialization**: Retrofit 2.11.0, OkHttp 4.12.0, Kotlinx Serialization
 - **Image Loading**: Coil Compose
@@ -28,7 +28,7 @@ app/src/main/java/com/interview/kit/
 ├── data/                            # API service, DTOs, Repository implementations
 └── ui/
     ├── home/                        # Home screen & ViewModel
-    ├── navigation/                  # Navigation 3 graph, backstack & navigator
+    ├── navigation/                  # Navigation 2.8.x graph and adaptive scaffold
     └── theme/                       # Material 3 Color, Theme, Typography
 ```
 

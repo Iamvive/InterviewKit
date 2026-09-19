@@ -24,6 +24,9 @@ import kotlinx.serialization.Serializable
 @Serializable
 object HomeRoute
 
+@Serializable
+data class PostDetailRoute(val postId: Int)
+
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun AppNavGraph() {
