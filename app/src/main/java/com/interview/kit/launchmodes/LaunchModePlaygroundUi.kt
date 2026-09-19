@@ -183,6 +183,26 @@ fun LaunchModePlaygroundUi(
                             }
                         }
 
+                        Spacer(modifier = Modifier.height(6.dp))
+                        val currentAffinity = try {
+                            currentActivity?.packageManager?.getActivityInfo(currentActivity.componentName, 0)?.taskAffinity ?: currentActivity?.packageName
+                        } catch (e: Exception) { currentActivity?.packageName } ?: "default"
+
+                        Surface(
+                            color = themeColor.copy(alpha = 0.12f),
+                            shape = RoundedCornerShape(6.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                text = "🏷️ taskAffinity: $currentAffinity",
+                                fontSize = 11.sp,
+                                fontFamily = FontFamily.Monospace,
+                                color = themeColor,
+                                fontWeight = FontWeight.SemiBold,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            )
+                        }
+
                         if (newIntentCount > 0) {
                             Spacer(modifier = Modifier.height(10.dp))
                             Surface(

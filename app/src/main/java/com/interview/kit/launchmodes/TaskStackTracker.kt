@@ -2,6 +2,7 @@ package com.interview.kit.launchmodes
 
 import android.app.Activity
 import android.app.Application
+import android.content.pm.PackageManager
 import android.os.Bundle
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,6 +15,7 @@ data class ActivityNode(
     val id: String,
     val name: String,
     val launchMode: String,
+    val taskAffinity: String,
     val taskId: Int,
     val hashCodeHex: String,
     val state: String,
@@ -54,10 +56,17 @@ object TaskStackTracker : Application.ActivityLifecycleCallbacks {
 
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
         val launchModeName = getLaunchModeName(activity)
+        val affinity = try {
+            activity.packageManager.getActivityInfo(activity.componentName, 0).taskAffinity ?: activity.packageName
+        } catch (e: Exception) {
+            activity.packageName
+        }
+
         val node = ActivityNode(
             id = "${activity::class.java.simpleName}@${Integer.toHexString(activity.hashCode())}",
             name = activity::class.java.simpleName,
             launchMode = launchModeName,
+            taskAffinity = affinity,
             taskId = activity.taskId,
             hashCodeHex = "@${Integer.toHexString(activity.hashCode())}",
             state = "Created",

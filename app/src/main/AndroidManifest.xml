@@ -38,12 +38,13 @@
             android:theme="@style/Theme.InterviewKit"
             android:windowSoftInputMode="adjustResize" />
 
-        <!-- Activity C (singleTask launchMode) -->
+        <!-- Activity C (singleTask + custom taskAffinity) -->
         <activity
             android:name=".launchmodes.ActivityC"
             android:exported="true"
             android:label="Activity C (singleTask)"
             android:launchMode="singleTask"
+            android:taskAffinity="com.interview.kit.taskC"
             android:theme="@style/Theme.InterviewKit"
             android:windowSoftInputMode="adjustResize" />
 
