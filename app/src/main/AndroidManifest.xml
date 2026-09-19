@@ -15,11 +15,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.InterviewKit">
 
-        <!-- Entry Point: Activity A (standard launchMode) -->
+        <!-- Single Launcher: Activity A (InterviewKit) -->
         <activity
             android:name=".launchmodes.ActivityA"
             android:exported="true"
-            android:label="Activity A (standard)"
+            android:label="@string/app_name"
             android:launchMode="standard"
             android:theme="@style/Theme.InterviewKit"
             android:windowSoftInputMode="adjustResize">
@@ -32,7 +32,7 @@
         <!-- Activity B (singleTop launchMode) -->
         <activity
             android:name=".launchmodes.ActivityB"
-            android:exported="true"
+            android:exported="false"
             android:label="Activity B (singleTop)"
             android:launchMode="singleTop"
             android:theme="@style/Theme.InterviewKit"
@@ -41,7 +41,7 @@
         <!-- Activity C (singleTask launchMode) -->
         <activity
             android:name=".launchmodes.ActivityC"
-            android:exported="true"
+            android:exported="false"
             android:label="Activity C (singleTask)"
             android:launchMode="singleTask"
             android:theme="@style/Theme.InterviewKit"
@@ -50,7 +50,7 @@
         <!-- Activity D (singleInstance launchMode) -->
         <activity
             android:name=".launchmodes.ActivityD"
-            android:exported="true"
+            android:exported="false"
             android:label="Activity D (singleInstance)"
             android:launchMode="singleInstance"
             android:theme="@style/Theme.InterviewKit"
@@ -58,7 +58,7 @@
 
         <activity
             android:name=".MainActivity"
-            android:exported="true"
+            android:exported="false"
             android:label="@string/app_name"
             android:theme="@style/Theme.InterviewKit"
             android:windowSoftInputMode="adjustResize" />
